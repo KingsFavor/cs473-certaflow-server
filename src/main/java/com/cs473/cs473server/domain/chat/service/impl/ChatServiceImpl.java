@@ -58,7 +58,7 @@ public class ChatServiceImpl implements ChatService {
         List<UserMessageLike> userMessageLikeList = userMessageLikeRepository.findByUserMessageLikeUserId(userId);
 
         /* get messages */
-        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatMessageChatId(chatId);
+        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatMessageChatIdOrderByGeneratedAtDesc(chatId);
 
         /* check like exists & craft element */
         for (ChatMessage chatMessage : chatMessageList) {
