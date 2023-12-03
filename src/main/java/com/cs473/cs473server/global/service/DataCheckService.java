@@ -46,6 +46,10 @@ public class DataCheckService {
         return chatRepository.findById(chatId).isPresent();
     }
 
+    public boolean isChatMessageExist(String messageId) {
+        return chatMessageRepository.findById(messageId).isPresent();
+    }
+
     /* -------------------------------------------------------- */
     /* -------------------------------------------------------- */
 
@@ -68,6 +72,14 @@ public class DataCheckService {
 
     public boolean isTipIsFromUser(String tipId, String userId) {
         return tipRepository.findById(tipId).get().getTipUserId().equals(userId);
+    }
+
+    public boolean isMessageIsInChat(String messageId, String chatId) {
+        return chatMessageRepository.findById(messageId).get().getChatMessageChatId().equals(chatId);
+    }
+
+    public boolean isMessageFromUser(String messageId, String userId) {
+        return chatMessageRepository.findById(messageId).get().getChatMessageUserId().equals(userId);
     }
 
     /* -------------------------------------------------------- */

@@ -57,7 +57,7 @@ public class ChatServiceImpl implements ChatService {
         List<UserMessageLike> userMessageLikeList = userMessageLikeRepository.findByUserMessageLikeUserId(userId);
 
         /* get messages */
-        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatMessageChatIdOrderByGeneratedAtDesc(chatId);
+        List<ChatMessage> chatMessageList = chatMessageRepository.findByChatMessageChatIdOrderByGeneratedAtAsc(chatId);
 
         /* check like exists & craft element */
         for (ChatMessage chatMessage : chatMessageList) {
@@ -138,4 +138,30 @@ public class ChatServiceImpl implements ChatService {
         resultMap.put("httpStatus", HttpStatus.OK);
         return resultMap;
     }
+
+    @Override
+    public Map<String, Object> deleteChatMessage(String messageId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* get message likes */
+        List<UserMessageLike> userMessageLikeList = userMessageLikeRepository.findByUserMessageLikeChatMessageId(messageId);
+        Integer likeCount = userMessageLikeList.size();
+
+        /* delete likes */
+        for (UserMessageLike messageLike : userMessageLikeList) {
+            userMessageLikeRepository.deleteById(messageLike.getMappingId());
+        }
+
+        /* delete message */
+        chatMessageRepository.deleteById(messageId);
+
+        item.put("deletedMessageId", messageId);
+        item.put("deletedMessageLikeCount", likeCount);
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+
 }

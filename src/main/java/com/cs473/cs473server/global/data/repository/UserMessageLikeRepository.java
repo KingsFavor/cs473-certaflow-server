@@ -10,5 +10,6 @@ public interface UserMessageLikeRepository extends JpaRepository<UserMessageLike
 
     Optional<UserMessageLike> findById(String mappingId);
     List<UserMessageLike> findByUserMessageLikeUserId(String userId);
+    List<UserMessageLike> findByUserMessageLikeChatMessageId(String messageId);
 
 }
