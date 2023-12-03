@@ -408,8 +408,8 @@ public class LocationController {
 
     @DeleteMapping("/{locationId}/tip/{tipId}/unlike")
     public ResponseEntity<Map<String, Object>> deleteLikeFromTip(@RequestHeader Map<String, String> httpHeader,
-                                                            @PathVariable String locationId,
-                                                            @PathVariable String tipId) {
+                                                                 @PathVariable String locationId,
+                                                                 @PathVariable String tipId) {
         /* check existence */
         /* location id */
         if (!dataCheckService.isLocationIdExist(locationId)) {
