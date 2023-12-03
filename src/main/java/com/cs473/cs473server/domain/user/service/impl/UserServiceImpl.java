@@ -8,6 +8,7 @@ import com.cs473.cs473server.global.data.entity.User;
 import com.cs473.cs473server.global.data.repository.LocationRepository;
 import com.cs473.cs473server.global.data.repository.OnPlanRepository;
 import com.cs473.cs473server.global.data.repository.UserRepository;
+import com.cs473.cs473server.global.service.ContributionLevelCoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final ContributionLevelCoreService contributionLevelCoreService;
     private final UserRepository userRepository;
     private final OnPlanRepository onPlanRepository;
     private final LocationRepository locationRepository;
@@ -28,16 +30,21 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            OnPlanRepository onPlanRepository,
-                           LocationRepository locationRepository) {
+                           LocationRepository locationRepository,
+                           ContributionLevelCoreService contributionLevelCoreService) {
         this.userRepository = userRepository;
         this.onPlanRepository = onPlanRepository;
         this.locationRepository = locationRepository;
+        this.contributionLevelCoreService = contributionLevelCoreService;
     }
 
     @Override
     public Map<String, Object> getDetail(String userId) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> item = new HashMap<>();
+
+        /* update contribution level */
+        contributionLevelCoreService.updateContribution(userId);
 
         User targetUser = userRepository.findById(userId).get();
 

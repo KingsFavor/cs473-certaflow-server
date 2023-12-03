@@ -10,5 +10,5 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, String
 
     Optional<ChatMessage> findById(String messageId);
     List<ChatMessage> findByChatMessageChatIdOrderByGeneratedAtAsc(String chatId);
-
+    List<ChatMessage> findByChatMessageUserId(String userId);
 }

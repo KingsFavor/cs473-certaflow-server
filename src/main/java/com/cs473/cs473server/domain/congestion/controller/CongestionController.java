@@ -28,7 +28,7 @@ public class CongestionController {
     }
 
 
-    @PostMapping("/location/{locationId}/official/register")
+    @PostMapping("/location/{locationId}/feedback/register")
     public ResponseEntity<Map<String, Object>> registerFeedBack(@RequestHeader Map<String, String> httpHeader,
                                                                 @PathVariable String locationId,
                                                                 @RequestBody Map<String, Object> requestBody) {

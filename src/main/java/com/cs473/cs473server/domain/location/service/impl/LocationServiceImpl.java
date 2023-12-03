@@ -10,6 +10,7 @@ import com.cs473.cs473server.global.data.entity.OnPlan;
 import com.cs473.cs473server.global.data.entity.Tip;
 import com.cs473.cs473server.global.data.entity.UserTipLike;
 import com.cs473.cs473server.global.data.repository.*;
+import com.cs473.cs473server.global.service.CongestionLevelCoreService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.*;
 @Log4j2
 public class LocationServiceImpl implements LocationService {
 
+    private final CongestionLevelCoreService congestionLevelCoreService;
     private final LocationRepository locationRepository;
     private final OnPlanRepository onPlanRepository;
     private final UserRepository userRepository;
@@ -35,19 +37,28 @@ public class LocationServiceImpl implements LocationService {
                                UserRepository userRepository,
                                TipRepository tipRepository,
                                UserTipLikeRepository userTipLikeRepository,
-                               ChatRepository chatRepository) {
+                               ChatRepository chatRepository,
+                               CongestionLevelCoreService congestionLevelCoreService) {
         this.locationRepository = locationRepository;
         this.onPlanRepository = onPlanRepository;
         this.userRepository = userRepository;
         this.tipRepository = tipRepository;
         this.userTipLikeRepository = userTipLikeRepository;
         this.chatRepository = chatRepository;
+        this.congestionLevelCoreService = congestionLevelCoreService;
     }
 
     @Override
     public Map<String, Object> getAllLocation() {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> item = new HashMap<>();
+
+        List<Location> locationList = locationRepository.findAll();
+
+        /* update congestion level */
+        for (Location location : locationList) {
+            congestionLevelCoreService.updateLocationCongestionLevel(location.getLocationId());
+        }
 
         item.put("locationList", locationRepository.findAll());
 
@@ -62,6 +73,9 @@ public class LocationServiceImpl implements LocationService {
 
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> item = new HashMap<>();
+
+        /* update congestion level */
+        congestionLevelCoreService.updateLocationCongestionLevel(locationId);
 
         Location targetLocation = locationRepository.findById(locationId).get();
         boolean isIncludedInOnPlan = false;

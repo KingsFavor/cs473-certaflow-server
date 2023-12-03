@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface CongestionOfficialRepository extends JpaRepository<CongestionOfficial, String> {
 
     List<CongestionOfficial> findAll();
+    List<CongestionOfficial> findByCongestionOfficialLocationIdOrderByExpiredAtDesc(String locationId);
     Optional<CongestionOfficial> findById(String congestionId);
 
 }

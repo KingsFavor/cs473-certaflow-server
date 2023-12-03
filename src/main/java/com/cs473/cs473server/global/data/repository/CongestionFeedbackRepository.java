@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface CongestionFeedbackRepository extends JpaRepository<CongestionFeedback, String> {
 
+    List<CongestionFeedback> findByCongestionFeedbackLocationId(String locationId);
+    List<CongestionFeedback> findByCongestionFeedbackUserId(String userId);
     List<CongestionFeedback> findAll();
     Optional<CongestionFeedback> findById(String congestionId);
 

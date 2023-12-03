@@ -10,5 +10,6 @@ public interface TipRepository extends JpaRepository<Tip, String> {
 
     Optional<Tip> findById(String tipId);
     List<Tip> findByTipLocationId(String locationId);
+    List<Tip> findByTipUserId(String userId);
 
 }
