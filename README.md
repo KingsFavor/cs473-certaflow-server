@@ -128,27 +128,27 @@ export MESSAGE_LIKE_POINT=10 &&
 
 
 ## domain/controller
-- This classes handle endpoint request from Spring dispatcher.
-- They will call each service components.
+- These classes handle endpoint request from Spring dispatcher.
+- They will call service components.
 
 ## domain/service
-- This classes handle some logics called by controllers.
-- Main program logics are handled here.
-- They will call each service components.
+- These classes handle some logics called by controllers.
+- Main program logics are handled in here.
+- They will call repository components.
 
 ## global/data/dto
 - Data abstraction classes.
 
 ## global/data/entity
-- Data entity for Jpa Repository.
+- Data entities for Jpa Repository.
 
 ## global/data/repository
-- Extending classes for Jpa Repository.
-- Due to security and convenience, this project use Jpa queries.
+- Extending Jpa Repository class.
+- For security and convenience, this project uses Jpa queries.
 
 ## global/scheduler
 - Spring Scheduler classes.
-- These classes will handle scheduled logic (e.g. clean-up database)
+- These classes will handle scheduled logics. (e.g. clean-up database)
 
 ## global/service
 - Global service classes.
