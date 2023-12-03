@@ -3,21 +3,20 @@ package com.cs473.cs473server.domain.location.service.impl;
 import com.cs473.cs473server.domain.location.service.LocationService;
 import com.cs473.cs473server.global.data.dto.LocationDto;
 import com.cs473.cs473server.global.data.dto.OnPlanDto;
+import com.cs473.cs473server.global.data.dto.TipDto;
+import com.cs473.cs473server.global.data.dto.UserTipLikeDto;
 import com.cs473.cs473server.global.data.entity.Location;
 import com.cs473.cs473server.global.data.entity.OnPlan;
-import com.cs473.cs473server.global.data.repository.LocationRepository;
-import com.cs473.cs473server.global.data.repository.OnPlanRepository;
-import com.cs473.cs473server.global.data.repository.UserRepository;
+import com.cs473.cs473server.global.data.entity.Tip;
+import com.cs473.cs473server.global.data.entity.UserTipLike;
+import com.cs473.cs473server.global.data.repository.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -26,14 +25,20 @@ public class LocationServiceImpl implements LocationService {
     private final LocationRepository locationRepository;
     private final OnPlanRepository onPlanRepository;
     private final UserRepository userRepository;
+    private final TipRepository tipRepository;
+    private final UserTipLikeRepository userTipLikeRepository;
 
     @Autowired
     public LocationServiceImpl(LocationRepository locationRepository,
                                OnPlanRepository onPlanRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               TipRepository tipRepository,
+                               UserTipLikeRepository userTipLikeRepository) {
         this.locationRepository = locationRepository;
         this.onPlanRepository = onPlanRepository;
         this.userRepository = userRepository;
+        this.tipRepository = tipRepository;
+        this.userTipLikeRepository = userTipLikeRepository;
     }
 
     @Override
@@ -244,6 +249,149 @@ public class LocationServiceImpl implements LocationService {
         locationRepository.save(targetLocationDto.toEntity());
 
         item.put("afterCount", targetLocationDto.getNearUserCount());
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> getAllTips(String locationId, String userId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* result list */
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        /* get tip list */
+        List<Tip> tipListOfLocation = tipRepository.findByTipLocationId(locationId);
+
+        /* check like exist & craft list */
+        for (Tip locationTip : tipListOfLocation) {
+            Map<String, Object> listElement = new HashMap<>();
+            listElement.put("tipInfo", locationTip);
+
+            boolean isLike = false;
+            List<UserTipLike> userTipLikeList = userTipLikeRepository.findByUserTipLikeUserId(userId);
+            for (UserTipLike tipLike : userTipLikeList) {
+                if (tipLike.getUserTipLikeTipId().equals(locationTip.getTipId())) {
+                    isLike = true;
+                }
+            }
+            listElement.put("isLikedByUser", isLike);
+            resultList.add(listElement);
+        }
+
+        item.put("tipList", resultList);
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> addTip(String locationId, String userId, Map<String, String> requestBody, boolean isOfficial) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* craft tip dto */
+        TipDto tipDto = TipDto.builder()
+                .tipId(UUID.randomUUID().toString())
+                .tipContent(requestBody.get("tipContent"))
+                .likesCount(0)
+                .isOfficial(isOfficial)
+                .tipUserId(userId)
+                .tipLocationId(locationId)
+                .build();
+
+        /* save */
+        tipRepository.save(tipDto.toEntity());
+
+        item.put("addedTip", tipDto);
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> deleteTip(String tipId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* delete tip likes */
+        List<UserTipLike> tipLikes = userTipLikeRepository.findByUserTipLikeTipId(tipId);
+        Integer tipLikeCount = tipLikes.size();
+        for (UserTipLike tipLike : tipLikes) {
+            userTipLikeRepository.deleteById(tipLike.getMappingId());
+        }
+
+        /* delete tip */
+        tipRepository.deleteById(tipId);
+
+        item.put("deletedTipId", tipId);
+        item.put("deletedTipLikes", tipLikeCount);
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> addTipLike(String tipId, String userId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* already exist */
+        boolean isLiked = false;
+        List<UserTipLike> userTipLikeList = userTipLikeRepository.findByUserTipLikeUserId(userId);
+        for (UserTipLike tipLike : userTipLikeList) {
+            if (tipLike.getUserTipLikeTipId().equals(tipId)) {
+                isLiked = true;
+            }
+        }
+        if (isLiked) {
+            resultMap.put("reason", "Already liked by the user.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return resultMap;
+        }
+
+        /* craft UserTipLikeDto */
+        UserTipLikeDto userTipLikeDto = UserTipLikeDto.builder()
+                .mappingId(UUID.randomUUID().toString())
+                .mappedAt(LocalDateTime.now())
+                .userTipLikeUserId(userId)
+                .userTipLikeTipId(tipId)
+                .build();
+
+        /* save */
+        userTipLikeRepository.save(userTipLikeDto.toEntity());
+
+        item.put("addedTipLike", userTipLikeDto);
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> deleteTipLike(String tipId, String userId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* check existence */
+        boolean isLiked = false;
+        List<UserTipLike> userTipLikeList = userTipLikeRepository.findByUserTipLikeUserId(userId);
+        for (UserTipLike tipLike : userTipLikeList) {
+            if (tipLike.getUserTipLikeTipId().equals(tipId)) {
+                isLiked = true;
+            }
+        }
+        if (!isLiked) {
+            resultMap.put("reason", "The user have not liked the given tip.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return resultMap;
+        }
+
+        /* delete */
+        userTipLikeRepository.deleteById(tipId);
+
+        item.put("deleteResult", true);
         resultMap.put("item", item);
         resultMap.put("httpStatus", HttpStatus.OK);
         return resultMap;

@@ -22,7 +22,7 @@ public class Tip {
 
     @Getter
     @Column(name = "tip_content", columnDefinition = "TEXT")
-    String contentId;
+    String tipContent;
 
     @Getter
     @Column(name = "likes_count")
@@ -43,7 +43,7 @@ public class Tip {
     public TipDto toDto() {
         return TipDto.builder()
                 .tipId(tipId)
-                .contentId(contentId)
+                .tipContent(tipContent)
                 .likesCount(likesCount)
                 .isOfficial(isOfficial)
                 .tipUserId(tipUserId)

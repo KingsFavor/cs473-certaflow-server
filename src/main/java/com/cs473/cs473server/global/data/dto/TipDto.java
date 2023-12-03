@@ -12,7 +12,7 @@ import lombok.*;
 public class TipDto {
 
     String tipId;
-    String contentId;
+    String tipContent;
     Integer likesCount;
     boolean isOfficial;
     String tipUserId;
@@ -21,7 +21,7 @@ public class TipDto {
     public Tip toEntity() {
         return Tip.builder()
                 .tipId(tipId)
-                .contentId(contentId)
+                .tipContent(tipContent)
                 .likesCount(likesCount)
                 .isOfficial(isOfficial)
                 .tipUserId(tipUserId)
