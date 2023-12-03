@@ -1,6 +1,7 @@
 package com.cs473.cs473server.domain.chat.service.impl;
 
 import com.cs473.cs473server.domain.chat.service.ChatService;
+import com.cs473.cs473server.global.data.dto.ChatMessageDto;
 import com.cs473.cs473server.global.data.entity.Chat;
 import com.cs473.cs473server.global.data.entity.ChatMessage;
 import com.cs473.cs473server.global.data.entity.UserMessageLike;
@@ -11,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -109,6 +108,32 @@ public class ChatServiceImpl implements ChatService {
         chatRepository.save(targetChat);
 
         item.put("currentMembersCount", targetChat.getMembersCount());
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> addMessageToChat(String chatId, String userId, String messageContent, boolean isOfficial) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        /* craft chatMessageDto */
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .messageId(UUID.randomUUID().toString())
+                .messageContent(messageContent)
+                .generatedAt(LocalDateTime.now())
+                .expiredAt(LocalDateTime.now().plusDays(1))
+                .likesCount(0)
+                .isOfficial(isOfficial)
+                .chatMessageChatId(chatId)
+                .chatMessageUserId(userId)
+                .build();
+
+        /* save */
+        chatMessageRepository.save(chatMessageDto.toEntity());
+
+        item.put("addedMessage", chatMessageDto);
         resultMap.put("item", item);
         resultMap.put("httpStatus", HttpStatus.OK);
         return resultMap;

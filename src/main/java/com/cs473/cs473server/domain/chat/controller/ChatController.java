@@ -97,34 +97,46 @@ public class ChatController {
         return responseBodyFormatService.formatResponseEntity(chatService.getOutFromChatRoom(chatId));
     }
 
-//    @PostMapping("{chatId}/message")
-//    public ResponseEntity<Map<String, Object>> addMessage(@RequestHeader Map<String, String> httpHeader,
-//                                                          @PathVariable String chatId) {
-//        /* check existence */
-//        if (!dataCheckService.isChatIdExist(chatId)) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "Not existing chat id : " + chatId);
-//            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//
-//        /* header */
-//        String userId = httpHeader.get("cert_user_id");
-//        if (userId == null) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "user id must be given.");
-//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//        if (!dataCheckService.isUserIdExist(userId)) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "Not existing user id : " + userId);
-//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//
-//        /* request body validation */
-//
-//    }
+    @PostMapping("{chatId}/message")
+    public ResponseEntity<Map<String, Object>> addMessage(@RequestHeader Map<String, String> httpHeader,
+                                                          @PathVariable String chatId,
+                                                          @RequestBody Map<String, String> requestBody) {
+        /* check existence */
+        if (!dataCheckService.isChatIdExist(chatId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing chat id : " + chatId);
+            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* header */
+        String userId = httpHeader.get("cert_user_id");
+        if (userId == null) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "user id must be given.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+        if (!dataCheckService.isUserIdExist(userId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing user id : " + userId);
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* request body validation */
+        if (requestBody.get("messageContent") == null) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "message content cannot be empty.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* isOfficial */
+        String locationId = dataCheckService.getLocationIdFromChatId(chatId);
+        boolean isOfficial = dataCheckService.isMasterUserOfLocation(userId, locationId);
+
+        return responseBodyFormatService.formatResponseEntity(chatService.addMessageToChat(chatId, userId, requestBody.get("messageContent"), isOfficial));
+    }
 
 }

@@ -8,5 +8,5 @@ public interface ChatService {
     Map<String, Object> getChatMessages(String chatId, String userId);
     Map<String, Object> getInToChatRoom(String chatId);
     Map<String, Object> getOutFromChatRoom(String chatId);
-    //Map<String, Object> addMessageToChat(String chatId, String userId, String messageContent);
+    Map<String, Object> addMessageToChat(String chatId, String userId, String messageContent, boolean isOfficial);
 }
