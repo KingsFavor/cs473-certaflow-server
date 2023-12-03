@@ -1,6 +1,7 @@
 package com.cs473.cs473server.global.service;
 
 import com.cs473.cs473server.global.data.entity.Location;
+import com.cs473.cs473server.global.data.repository.ChatRepository;
 import com.cs473.cs473server.global.data.repository.LocationRepository;
 import com.cs473.cs473server.global.data.repository.TipRepository;
 import com.cs473.cs473server.global.data.repository.UserRepository;
@@ -13,14 +14,17 @@ public class DataCheckService {
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
     private final TipRepository tipRepository;
+    private final ChatRepository chatRepository;
 
     @Autowired
     public DataCheckService(LocationRepository locationRepository,
                             UserRepository userRepository,
-                            TipRepository tipRepository) {
+                            TipRepository tipRepository,
+                            ChatRepository chatRepository) {
         this.locationRepository = locationRepository;
         this.userRepository = userRepository;
         this.tipRepository = tipRepository;
+        this.chatRepository = chatRepository;
     }
 
     /* -------------------------------------------------------- */
@@ -36,6 +40,10 @@ public class DataCheckService {
 
     public boolean isTipIdExist(String tipId) {
         return tipRepository.findById(tipId).isPresent();
+    }
+
+    public boolean isChatIdExist(String chatId) {
+        return chatRepository.findById(chatId).isPresent();
     }
 
     /* -------------------------------------------------------- */

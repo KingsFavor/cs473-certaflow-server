@@ -27,18 +27,21 @@ public class LocationServiceImpl implements LocationService {
     private final UserRepository userRepository;
     private final TipRepository tipRepository;
     private final UserTipLikeRepository userTipLikeRepository;
+    private final ChatRepository chatRepository;
 
     @Autowired
     public LocationServiceImpl(LocationRepository locationRepository,
                                OnPlanRepository onPlanRepository,
                                UserRepository userRepository,
                                TipRepository tipRepository,
-                               UserTipLikeRepository userTipLikeRepository) {
+                               UserTipLikeRepository userTipLikeRepository,
+                               ChatRepository chatRepository) {
         this.locationRepository = locationRepository;
         this.onPlanRepository = onPlanRepository;
         this.userRepository = userRepository;
         this.tipRepository = tipRepository;
         this.userTipLikeRepository = userTipLikeRepository;
+        this.chatRepository = chatRepository;
     }
 
     @Override
@@ -71,7 +74,11 @@ public class LocationServiceImpl implements LocationService {
             }
         }
 
+        /* get chat id */
+        String chatId = chatRepository.findByChatLocationId(locationId).get(0).getChatId();
+
         item.put("locationInfo", targetLocation);
+        item.put("locationChatId", chatId);
         item.put("isIncludedInOnPlan", isIncludedInOnPlan);
         resultMap.put("item", item);
         resultMap.put("httpStatus", HttpStatus.OK);
@@ -363,6 +370,11 @@ public class LocationServiceImpl implements LocationService {
         /* save */
         userTipLikeRepository.save(userTipLikeDto.toEntity());
 
+        /* edit tip itself */
+        Tip targetTip = tipRepository.findById(tipId).get();
+        targetTip.setLikesCount(targetTip.getLikesCount() + 1);
+        tipRepository.save(targetTip);
+
         item.put("addedTipLike", userTipLikeDto);
         resultMap.put("item", item);
         resultMap.put("httpStatus", HttpStatus.OK);
@@ -390,6 +402,11 @@ public class LocationServiceImpl implements LocationService {
 
         /* delete */
         userTipLikeRepository.deleteById(tipId);
+
+        /* edit tip itself */
+        Tip targetTip = tipRepository.findById(tipId).get();
+        targetTip.setLikesCount(targetTip.getLikesCount() - 1);
+        tipRepository.save(targetTip);
 
         item.put("deleteResult", true);
         resultMap.put("item", item);

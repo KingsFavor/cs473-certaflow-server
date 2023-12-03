@@ -24,7 +24,7 @@ public class Chat {
 
     @Getter
     @Column(name = "generated_at")
-    LocalDateTime localDateTime;
+    LocalDateTime generatedAt;
 
     @Getter
     @Column(name = "members_count")
@@ -37,7 +37,7 @@ public class Chat {
     public ChatDto toDto() {
         return ChatDto.builder()
                 .chatId(chatId)
-                .localDateTime(localDateTime)
+                .generatedAt(generatedAt)
                 .membersCount(membersCount)
                 .chatLocationId(chatLocationId)
                 .build();

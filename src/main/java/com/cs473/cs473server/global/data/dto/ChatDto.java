@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 public class ChatDto {
 
     String chatId;
-    LocalDateTime localDateTime;
+    LocalDateTime generatedAt;
     Integer membersCount;
     String chatLocationId;
 
     public Chat toEntity() {
         return Chat.builder()
                 .chatId(chatId)
-                .localDateTime(localDateTime)
+                .generatedAt(generatedAt)
                 .membersCount(membersCount)
                 .chatLocationId(chatLocationId)
                 .build();
