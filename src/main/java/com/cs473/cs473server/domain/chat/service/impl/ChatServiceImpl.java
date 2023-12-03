@@ -94,6 +94,7 @@ public class ChatServiceImpl implements ChatService {
         item.put("currentMembersCount", targetChat.getMembersCount());
         resultMap.put("item", item);
         resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
     }
 
     @Override
@@ -110,5 +111,6 @@ public class ChatServiceImpl implements ChatService {
         item.put("currentMembersCount", targetChat.getMembersCount());
         resultMap.put("item", item);
         resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
     }
 }
