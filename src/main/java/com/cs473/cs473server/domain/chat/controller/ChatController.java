@@ -191,45 +191,91 @@ public class ChatController {
     }
 
 
-//    @PostMapping("/{chatId}/messages/{messageId}/like")
-//    public ResponseEntity<Map<String, Object>> addLikeToMessage(@RequestHeader Map<String, String> httpHeader,
-//                                                                @PathVariable String chatId,
-//                                                                @PathVariable String messageId) {
-//        /* check existence */
-//        if (!dataCheckService.isChatIdExist(chatId)) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "Not existing chat id : " + chatId);
-//            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//        if (!dataCheckService.isChatMessageExist(messageId)) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "Not existing chat message id : " + messageId);
-//            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//
-//        /* header */
-//        String userId = httpHeader.get("cert_user_id");
-//        if (userId == null) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "user id must be given.");
-//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//        if (!dataCheckService.isUserIdExist(userId)) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "Not existing user id : " + userId);
-//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//
-//        /* combination */
-//        if (!dataCheckService.isMessageIsInChat(messageId, chatId)) {
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put("reason", "The given message is not in the given chat.");
-//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
-//            return responseBodyFormatService.formatResponseEntity(resultMap);
-//        }
-//    }
+    @PostMapping("/{chatId}/messages/{messageId}/like")
+    public ResponseEntity<Map<String, Object>> addLikeToMessage(@RequestHeader Map<String, String> httpHeader,
+                                                                @PathVariable String chatId,
+                                                                @PathVariable String messageId) {
+        /* check existence */
+        if (!dataCheckService.isChatIdExist(chatId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing chat id : " + chatId);
+            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+        if (!dataCheckService.isChatMessageExist(messageId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing chat message id : " + messageId);
+            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* header */
+        String userId = httpHeader.get("cert_user_id");
+        if (userId == null) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "user id must be given.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+        if (!dataCheckService.isUserIdExist(userId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing user id : " + userId);
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* combination */
+        if (!dataCheckService.isMessageIsInChat(messageId, chatId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "The given message is not in the given chat.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        return responseBodyFormatService.formatResponseEntity(chatService.addLikeToMessage(messageId, userId));
+    }
+
+    @DeleteMapping("/{chatId}/messages/{messageId}/unlike")
+    public ResponseEntity<Map<String, Object>> deleteLikeToMessage(@RequestHeader Map<String, String> httpHeader,
+                                                                   @PathVariable String chatId,
+                                                                   @PathVariable String messageId) {
+        /* check existence */
+        if (!dataCheckService.isChatIdExist(chatId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing chat id : " + chatId);
+            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+        if (!dataCheckService.isChatMessageExist(messageId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing chat message id : " + messageId);
+            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* header */
+        String userId = httpHeader.get("cert_user_id");
+        if (userId == null) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "user id must be given.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+        if (!dataCheckService.isUserIdExist(userId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "Not existing user id : " + userId);
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        /* combination */
+        if (!dataCheckService.isMessageIsInChat(messageId, chatId)) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("reason", "The given message is not in the given chat.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return responseBodyFormatService.formatResponseEntity(resultMap);
+        }
+
+        return responseBodyFormatService.formatResponseEntity(chatService.deleteLikeFromChatMessage(messageId, userId));
+    }
 }

@@ -2,6 +2,7 @@ package com.cs473.cs473server.domain.chat.service.impl;
 
 import com.cs473.cs473server.domain.chat.service.ChatService;
 import com.cs473.cs473server.global.data.dto.ChatMessageDto;
+import com.cs473.cs473server.global.data.dto.UserMessageLikeDto;
 import com.cs473.cs473server.global.data.entity.Chat;
 import com.cs473.cs473server.global.data.entity.ChatMessage;
 import com.cs473.cs473server.global.data.entity.UserMessageLike;
@@ -163,5 +164,83 @@ public class ChatServiceImpl implements ChatService {
         return resultMap;
     }
 
+    @Override
+    public Map<String, Object> addLikeToMessage(String messageId, String userId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
 
+        boolean isLiked = false;
+
+        /* get message likes */
+        List<UserMessageLike> userMessageLikeList = userMessageLikeRepository.findByUserMessageLikeUserId(userId);
+        for (UserMessageLike userMessageLike : userMessageLikeList) {
+            if (userMessageLike.getUserMessageLikeChatMessageId().equals(messageId)) {
+                isLiked = true;
+            }
+        }
+
+        if (isLiked) {
+            resultMap.put("reason", "The user already likes this message.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return resultMap;
+        }
+
+        /* craft UserMessageLikeDto */
+        UserMessageLikeDto userMessageLikeDto = UserMessageLikeDto.builder()
+                .mappingId(UUID.randomUUID().toString())
+                .mappedAt(LocalDateTime.now())
+                .userMessageLikeUserId(userId)
+                .userMessageLikeChatMessageId(messageId)
+                .build();
+
+        /* save */
+        userMessageLikeRepository.save(userMessageLikeDto.toEntity());
+
+        /* update message itself */
+        ChatMessage targetChatMessage = chatMessageRepository.findById(messageId).get();
+        targetChatMessage.setLikesCount(targetChatMessage.getLikesCount() + 1);
+        chatMessageRepository.save(targetChatMessage);
+
+        item.put("currentLikeCount", targetChatMessage.getLikesCount());
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> deleteLikeFromChatMessage(String messageId, String userId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> item = new HashMap<>();
+
+        boolean isLiked = false;
+        String targetMessageId = "";
+
+        /* get message likes */
+        List<UserMessageLike> userMessageLikeList = userMessageLikeRepository.findByUserMessageLikeUserId(userId);
+        for (UserMessageLike userMessageLike : userMessageLikeList) {
+            if (userMessageLike.getUserMessageLikeChatMessageId().equals(messageId)) {
+                targetMessageId = userMessageLike.getMappingId();
+                isLiked = true;
+            }
+        }
+
+        if (!isLiked) {
+            resultMap.put("reason", "The user has not liked this message.");
+            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+            return resultMap;
+        }
+
+        /* delete */
+        userMessageLikeRepository.deleteById(targetMessageId);
+
+        /* update message itself */
+        ChatMessage targetChatMessage = chatMessageRepository.findById(messageId).get();
+        targetChatMessage.setLikesCount(targetChatMessage.getLikesCount() - 1);
+        chatMessageRepository.save(targetChatMessage);
+
+        item.put("currentLikeCount", targetChatMessage.getLikesCount());
+        resultMap.put("item", item);
+        resultMap.put("httpStatus", HttpStatus.OK);
+        return resultMap;
+    }
 }
