@@ -15,7 +15,14 @@ public class ResponseBodyFormatService {
 
         HttpStatus httpStatus = (HttpStatus) resultMap.get("httpStatus");
 
-        return new ResponseEntity<>((Map<String, Object>) resultMap.get("item"), httpStatus);
+        if (httpStatus.equals(HttpStatus.OK)) {
+            responseBody.put("item", resultMap.get("item"));
+        }
+        if (!httpStatus.equals(HttpStatus.OK)) {
+            responseBody.put("reason", resultMap.get("reason"));
+        }
+
+        return new ResponseEntity<>(responseBody, httpStatus);
     }
 
 }
