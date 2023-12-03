@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/v1/chat")
 public class ChatController {
 
     private final ResponseBodyFormatService responseBodyFormatService = new ResponseBodyFormatService();
@@ -97,7 +98,7 @@ public class ChatController {
         return responseBodyFormatService.formatResponseEntity(chatService.getOutFromChatRoom(chatId));
     }
 
-    @PostMapping("{chatId}/message")
+    @PostMapping("{chatId}/messages")
     public ResponseEntity<Map<String, Object>> addMessage(@RequestHeader Map<String, String> httpHeader,
                                                           @PathVariable String chatId,
                                                           @RequestBody Map<String, String> requestBody) {
@@ -138,5 +139,36 @@ public class ChatController {
 
         return responseBodyFormatService.formatResponseEntity(chatService.addMessageToChat(chatId, userId, requestBody.get("messageContent"), isOfficial));
     }
+
+//    @DeleteMapping("/{chatId}/message/{messageId}")
+//    public ResponseEntity<Map<String, Object>> deleteMessage(@RequestHeader Map<String, String> httpHeader,
+//                                                             @PathVariable String chatId,
+//                                                             @PathVariable String messageId) {
+//        /* check existence */
+//        if (!dataCheckService.isChatIdExist(chatId)) {
+//            Map<String, Object> resultMap = new HashMap<>();
+//            resultMap.put("reason", "Not existing chat id : " + chatId);
+//            resultMap.put("httpStatus", HttpStatus.NOT_FOUND);
+//            return responseBodyFormatService.formatResponseEntity(resultMap);
+//        }
+//        if () {
+//
+//        }
+//
+//        /* header */
+//        String userId = httpHeader.get("cert_user_id");
+//        if (userId == null) {
+//            Map<String, Object> resultMap = new HashMap<>();
+//            resultMap.put("reason", "user id must be given.");
+//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+//            return responseBodyFormatService.formatResponseEntity(resultMap);
+//        }
+//        if (!dataCheckService.isUserIdExist(userId)) {
+//            Map<String, Object> resultMap = new HashMap<>();
+//            resultMap.put("reason", "Not existing user id : " + userId);
+//            resultMap.put("httpStatus", HttpStatus.BAD_REQUEST);
+//            return responseBodyFormatService.formatResponseEntity(resultMap);
+//        }
+//    }
 
 }

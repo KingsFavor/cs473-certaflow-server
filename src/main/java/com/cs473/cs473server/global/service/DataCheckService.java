@@ -1,10 +1,7 @@
 package com.cs473.cs473server.global.service;
 
 import com.cs473.cs473server.global.data.entity.Location;
-import com.cs473.cs473server.global.data.repository.ChatRepository;
-import com.cs473.cs473server.global.data.repository.LocationRepository;
-import com.cs473.cs473server.global.data.repository.TipRepository;
-import com.cs473.cs473server.global.data.repository.UserRepository;
+import com.cs473.cs473server.global.data.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,16 +12,19 @@ public class DataCheckService {
     private final UserRepository userRepository;
     private final TipRepository tipRepository;
     private final ChatRepository chatRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Autowired
     public DataCheckService(LocationRepository locationRepository,
                             UserRepository userRepository,
                             TipRepository tipRepository,
-                            ChatRepository chatRepository) {
+                            ChatRepository chatRepository,
+                            ChatMessageRepository chatMessageRepository) {
         this.locationRepository = locationRepository;
         this.userRepository = userRepository;
         this.tipRepository = tipRepository;
         this.chatRepository = chatRepository;
+        this.chatMessageRepository = chatMessageRepository;
     }
 
     /* -------------------------------------------------------- */
