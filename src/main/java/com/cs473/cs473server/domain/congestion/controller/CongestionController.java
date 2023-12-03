@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("api/v1/congestion")
 public class CongestionController {
 
-    private ResponseBodyFormatService responseBodyFormatService;
+    private ResponseBodyFormatService responseBodyFormatService = new ResponseBodyFormatService();
 
     private final DataCheckService dataCheckService;
     private final CongestionService congestionService;
